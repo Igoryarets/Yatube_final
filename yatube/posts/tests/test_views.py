@@ -1,15 +1,17 @@
 import shutil
+import tempfile
 
 from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django import forms
 
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from posts.models import Group, Post, User
 
 
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 class PostViewsTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -54,9 +56,9 @@ class PostViewsTest(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         # Рекурсивно удаляем временную после завершения тестов
         shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def setUp(self):
         # Создаем неавторизованный клиент
