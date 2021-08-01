@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Посты авторов, на которых подписан текущий пользователь{% endblock %}
+{% block header %}Посты авторов, на которых подписан текущий пользователь{% endblock %}
+{% block content %}
+
+{% include "includes/menu.html" with follow=True %}
+
+  {% for post in page %}
+    {% include "includes/post_item.html" %}
+  {% endfor %}
+
+  {% include "includes/paginator.html" %}
+
+{% endblock %}
