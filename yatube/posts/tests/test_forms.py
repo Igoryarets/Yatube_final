@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from posts.forms import PostForm, CommentForm
+from posts.forms import CommentForm, PostForm
 from posts.models import Group, Post, User
 
 
@@ -46,7 +46,6 @@ class PostCreateFormTests(TestCase):
         нового поста на странице /new/,
         убеждаемся, что при отправке формы создаётся
         новая запись в базе данных.
-
         """
         # Подготавливаем изображение
         small_gif = (
@@ -100,7 +99,6 @@ class PostCreateFormTests(TestCase):
         через форму на странице /<username>/<post_id>/edit/.
         Проверяем, что изменяется соответствующая запись
         в базе данных.
-
         """
         # Подготавливаем изображение
         small_gif = (
@@ -175,7 +173,6 @@ class PostCreateFormTests(TestCase):
         """
         Проверка: только авторизированный пользователь
         может комментировать посты.
-
         """
 
         post = Post.objects.create(
