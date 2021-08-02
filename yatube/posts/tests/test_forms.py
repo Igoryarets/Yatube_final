@@ -138,18 +138,14 @@ class PostCreateFormTests(TestCase):
         post_request = self.authorized_client.get(reverse('index'))
         first_object = post_request.context['page'].object_list[0]
 
-        print(first_object.image.name)
-
         self.assertEqual(first_object.text, form_data['text'])
         self.assertEqual(first_object.author, self.user)
-#        self.assertEqual(first_object.image.name, self.image_name)
         self.assertEqual(first_object.group, self.test_group)
         self.assertTrue(
             Post.objects.filter(
                 text=form_data['text'],
                 author=self.user,
-                group=self.test_group,
-#                image=self.image_name,
+                group=self.test_group
             ).exists()
         )
         # добавил новую группу
