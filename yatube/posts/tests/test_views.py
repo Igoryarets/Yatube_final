@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from posts.models import Group, Post, User
+from posts.models import Follow, Group, Post, User
 
 
 @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
@@ -395,9 +395,9 @@ class PostViewsTest(TestCase):
         ).content
         self.assertNotEqual(response_content_1, response_content_2)
 
-    def test_following_post(self):
+    def test_follow_post(self):
         """
-        Проверка системы подписки и отписки
+        Проверка системы подписки
         на авторов постов.
 
         """
@@ -424,22 +424,47 @@ class PostViewsTest(TestCase):
         self.assertEqual((page_object_2.group), self.post.group)
         self.assertEqual((page_object_2.image), self.post.image)
 
+    def test_unfollow_post(self):
+        """
+        Проверка системы отписки
+        от авторов постов.
+
+        """
+        # подписываемся на автора поста
+        self.follower_client.get(
+            reverse('profile_follow', kwargs={'username': self.post.author})
+        )
         # отписываемся от автора поста
         self.follower_client.get(reverse('profile_unfollow',
                                  kwargs={'username': self.post.author}))
 
         # проверяем, что follower_client отписался
-        response_3 = self.follower_client.get(reverse('follow_index'))
-        page_object_3 = response_3.context['page'].object_list
-        self.assertEqual((len(page_object_3)), 0)
+        response = self.follower_client.get(reverse('follow_index'))
+        page_object = response.context['page'].object_list
+        self.assertEqual((len(page_object)), 0)
 
-        # проверяем, что автор не может подписаться сам на себя
-        response_4 = self.authorized_client.get(reverse('follow_index'))
-        page_object_4 = response_4.context['page'].object_list
-        self.assertEqual((len(page_object_4)), 0)
+    def test_follow_yourself(self):
+        """
+        Проверяем, что автор не может подписаться сам на себя.
+
+        """
+        response = self.authorized_client.get(reverse('follow_index'))
+        page_object = response.context['page'].object_list
+        self.assertEqual((len(page_object)), 0)
         self.authorized_client.get(
             reverse('profile_follow', kwargs={'username': self.post.author})
         )
-        response_5 = self.authorized_client.get(reverse('follow_index'))
-        page_object_5 = response_5.context['page'].object_list
-        self.assertEqual((len(page_object_5)), 0)
+        response = self.authorized_client.get(reverse('follow_index'))
+        page_object = response.context['page'].object_list
+        self.assertEqual((len(page_object)), 0)
+
+    def test_follow_guest(self):
+        """
+        Проверяем, что неавторизованный пользователь не может подписываться.
+
+        """
+        self.guest_client.get(
+            reverse('profile_follow', kwargs={'username': self.post.author})
+        )
+        follow_counts = Follow.objects.count()
+        self.assertEqual(follow_counts, 0)

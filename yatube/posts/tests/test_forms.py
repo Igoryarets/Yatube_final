@@ -39,6 +39,7 @@ class PostCreateFormTests(TestCase):
 
         self.redirect_guest = '/auth/login/?next=%2Fnew%2F'
         self.image_name = 'posts/small.gif'
+        self.redirect_guest_comment = '/auth/login/?next=/leomessi/1/comment/'
 
     def test_create_post(self):
         """
@@ -145,7 +146,7 @@ class PostCreateFormTests(TestCase):
             Post.objects.filter(
                 text=form_data['text'],
                 author=self.user,
-                group=self.test_group
+                group=self.test_group,
             ).exists()
         )
         # добавил новую группу
@@ -191,4 +192,15 @@ class PostCreateFormTests(TestCase):
                                  'username': post.author.username,
                                  'post_id': post.id,
                              }))
+        self.assertEqual(post.comments.count(), 1)
+
+        # неавторизованный пользователь не может оставлять комменты
+        response_1 = self.guest_client.post(
+            reverse('add_comment', kwargs={'username': post.author.username,
+                                           'post_id': post.id}),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response_1, self.redirect_guest_comment)
+        # остался прежний комментарий
         self.assertEqual(post.comments.count(), 1)

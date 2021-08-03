@@ -111,9 +111,9 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    if request.user.username == username:
-        return redirect('profile', username=request.user)
     author = get_object_or_404(User, username=username)
+    if request.user == author:
+        return redirect('profile', username=request.user)
     Follow.objects.get_or_create(user=request.user, author=author)
     return redirect('profile', username=request.user)
 
@@ -128,11 +128,11 @@ def profile_unfollow(request, username):
 def page_not_found(request, exception):
     return render(
         request,
-        "misc/404.html",
-        {"path": request.path},
+        'misc/404.html',
+        {'path': request.path},
         status=404
     )
 
 
 def server_error(request):
-    return render(request, "misc/500.html", status=500)
+    return render(request, 'misc/500.html', status=500)

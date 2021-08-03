@@ -244,8 +244,7 @@ class PostsURLTests(TestCase):
     def test_urls_redirect_for_follow_unfollow(self):
         """
         Проверка: правильно ли работает редирект
-        со страницы /leomessi/follow/,
-        со страницы /leomessi/unfollow/.
+        со страницы /leomessi/follow/.
 
         """
         user = User.objects.create(
@@ -263,6 +262,21 @@ class PostsURLTests(TestCase):
 
         response = authorized_client.get(self.url_unfollow)
         self.assertRedirects(response, self.redirect_follow)
+
+    def test_urls_redirect_for_unfollow(self):
+        """
+        Проверка: правильно ли работает редирект
+        со страницы /leomessi/unfollow/.
+
+        """
+        user = User.objects.create(
+            first_name='Cristiano',
+            last_name='Ronaldo',
+            username='CR7',
+            email='CR7@gmail.com'
+        )
+        authorized_client = Client()
+        authorized_client.force_login(user)
 
         response = self.guest_client.get(self.url_follow)
         self.assertRedirects(response, self.redirect_guest_follow)
