@@ -16,6 +16,11 @@ handler404 = "posts.views.page_not_found"
 handler500 = "posts.views.server_error"
 
 if settings.DEBUG:
+
+#    import debug_toolbar
+
+#    urlpatterns += (path("__debug__/", include(debug_toolbar.urls)),)
+
     urlpatterns += static(
         settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
     )

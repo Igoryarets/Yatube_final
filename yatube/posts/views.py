@@ -61,13 +61,14 @@ def post_view(request, username, post_id):
 @login_required
 def add_comment(request, username, post_id):
     post = get_object_or_404(Post, id=post_id, author__username=username)
+    author = post.author
     form = CommentForm(request.POST or None)
     if form.is_valid():
         new_comment = form.save(commit=False)
         new_comment.post = post
         new_comment.author = request.user
         new_comment.save()
-    return redirect('post', username=request.user, post_id=post_id)
+    return redirect('post', username=author, post_id=post_id)
 
 
 @login_required
